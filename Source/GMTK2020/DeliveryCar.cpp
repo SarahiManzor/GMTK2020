@@ -8,7 +8,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/PrimitiveComponent.h" 
+#include "Components/PrimitiveComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ADeliveryCar::ADeliveryCar()
@@ -27,9 +28,18 @@ ADeliveryCar::ADeliveryCar()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
+	// Guide Mesh
+	GuideMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Guide Mesh"));
+	GuideMesh->SetupAttachment(Mesh);
+
 	// Base speeds
 	AccelerationForce = 100.0f;
 	TurnForce = 100.0f;
+
+	DeliveryLocation = FVector::ZeroVector;
+	DeliveryRange = 200.0f;
+
+	TopSpeed = 15000.0f;
 }
 
 // Called when the game starts or when spawned
@@ -44,6 +54,13 @@ void ADeliveryCar::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AddForwardForce();
+	UpdateGuideMarker();
+
+	// Todo Handle outside of this class
+	if ((Mesh->GetComponentLocation() - DeliveryLocation).Size() < DeliveryRange)
+	{
+		ThrowDelivery();
+	}
 }
 
 // Called to bind functionality to input
@@ -57,9 +74,20 @@ void ADeliveryCar::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+void ADeliveryCar::SetDeliveryLocation(FVector NewLocation)
+{
+	DeliveryLocation = NewLocation;
+}
+
+float ADeliveryCar::GetSpeed()
+{
+	return GetVelocity().Size();
+}
+
 void ADeliveryCar::AddForwardForce()
 {
 	//AddMovementInput(GetActorForwardVector(), AccelerationForce);
+	if (GetSpeed() < TopSpeed)
 	Mesh->AddForce(AccelerationForce * GetActorForwardVector());
 	//UE_LOG(LogTemp, Warning, TEXT("Adding Force"));
 }
@@ -71,6 +99,14 @@ void ADeliveryCar::AddTurnForce(float AxisValue)
 
 void ADeliveryCar::ThrowDelivery()
 {
+	DeliveryLocation = FVector(FMath::FRandRange(-10000.0f, 10000.0f), FMath::FRandRange(-10000.0f, 10000.0f), 0.0f);
+}
 
+void ADeliveryCar::UpdateGuideMarker()
+{
+	FRotator LookAtRotator = UKismetMathLibrary::FindLookAtRotation(GuideMesh->GetComponentLocation(), DeliveryLocation);
+	LookAtRotator.Pitch = 0.0f;
+
+	GuideMesh->SetWorldRotation(LookAtRotator);
 }
 

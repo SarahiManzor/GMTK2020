@@ -39,6 +39,12 @@ private:
 	UPROPERTY(EditAnywhere)
 	float TurnForce; // Force applied for turning
 
+	UPROPERTY(EditAnywhere)
+	float DeliveryRange;
+
+	UPROPERTY(EditAnywhere)
+	float TopSpeed;
+
 	// Components
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
@@ -49,16 +55,26 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh;
 
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* GuideMesh;
+
 	// References
 
 	// State
+	FVector DeliveryLocation;
+
+	float Health;
 
 	// ----------Custom Functions----------
 public:
+	void SetDeliveryLocation(FVector NewLocation);
+	float GetSpeed();
 protected:
 private:
 	void AddForwardForce();
 	void AddTurnForce(float AxisValue);
 	void ThrowDelivery();
+	void UpdateGuideMarker();
 
 };
