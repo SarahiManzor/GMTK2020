@@ -10,6 +10,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ADeliveryCar::ADeliveryCar()
@@ -40,6 +41,9 @@ ADeliveryCar::ADeliveryCar()
 	DeliveryRange = 200.0f;
 
 	TopSpeed = 15000.0f;
+
+	TotalDeliveries = 0;
+	ReverseTime = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -55,12 +59,6 @@ void ADeliveryCar::Tick(float DeltaTime)
 
 	AddForwardForce();
 	UpdateGuideMarker();
-
-	// Todo Handle outside of this class
-	if ((Mesh->GetComponentLocation() - DeliveryLocation).Size() < DeliveryRange)
-	{
-		ThrowDelivery();
-	}
 }
 
 // Called to bind functionality to input
@@ -84,6 +82,28 @@ float ADeliveryCar::GetSpeed()
 	return GetVelocity().Size();
 }
 
+float ADeliveryCar::GetDeliveryRange()
+{
+	return DeliveryRange;
+}
+
+void ADeliveryCar::Reverse(float WorldRange)
+{
+	float Time = UGameplayStatics::GetTimeSeconds(this);
+	if (Time - ReverseTime < 1.0f) return;
+
+	Mesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	FRotator Rotation = GetActorRotation();
+	Rotation.Yaw -= 180.0f;
+	SetActorRotation(Rotation);
+
+	FVector ActorLocation = GetActorLocation();
+	ActorLocation.X = FMath::Clamp(ActorLocation.X, -WorldRange, WorldRange);
+	ActorLocation.Y = FMath::Clamp(ActorLocation.Y, -WorldRange, WorldRange);
+
+	ReverseTime = Time;
+}
+
 void ADeliveryCar::AddForwardForce()
 {
 	//AddMovementInput(GetActorForwardVector(), AccelerationForce);
@@ -99,7 +119,10 @@ void ADeliveryCar::AddTurnForce(float AxisValue)
 
 void ADeliveryCar::ThrowDelivery()
 {
-	DeliveryLocation = FVector(FMath::FRandRange(-10000.0f, 10000.0f), FMath::FRandRange(-10000.0f, 10000.0f), 0.0f);
+	UE_LOG (LogTemp, Warning, TEXT("Pizza Delivered!"));
+	TotalDeliveries += 1;
+
+	// Todo spawn pizza box mesh and throw at house (Make sure car doesnt collide with the box
 }
 
 void ADeliveryCar::UpdateGuideMarker()

@@ -28,6 +28,14 @@ public:
 protected:
 private:
 	// Config
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ADeliveryTarget> DeliveryLocationClass;
+
+	UPROPERTY(EditAnywhere)
+	int32 TotalLocations;
+
+	UPROPERTY(EditAnywhere)
+	float MaximumNextRange;
 
 	// Components
 	UPROPERTY(VisibleAnywhere)
@@ -35,13 +43,18 @@ private:
 
 	// References
 	ADeliveryCar* MainCar;
-	TArray<ADeliveryTarget*> DeliveryLocation;
+	TArray<ADeliveryTarget*> DeliveryLocations;
 
 	// State
+	ADeliveryTarget* CurrentTarget;
 
 // ----------Custom Functions----------
 public:
 protected:
-
+private:
+	void SpawnRandomDeliveryLocations();
+	void SetNewTarget();
+	void CheckDelivery();
+	void CheckCarBounds();
 	
 };

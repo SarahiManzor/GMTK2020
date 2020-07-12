@@ -46,7 +46,6 @@ void UWorldChunker::Update(FVector PlayerLocation)
 				FVector Pos = FVector(x * ChunkWidth + ChunkWidth / 2.0f, y * ChunkWidth + ChunkWidth / 2.0f, 0.0f);
 				AActor* SpawnedGround = GetWorld()->SpawnActor<AActor>(Ground, Pos, FRotator::ZeroRotator);
 				SpawnedGround->SetActorScale3D(FVector(ChunkWidth / 1000.0f, ChunkWidth / 1000.0f, 1.0f));
-
 			}
 
 			if (Cactus)
@@ -54,10 +53,22 @@ void UWorldChunker::Update(FVector PlayerLocation)
 				for (int32 i = 0; i < CactusInChunk; i++)
 				{
 					FVector RandomPos = FVector(FMath::FRandRange(0, ChunkWidth) + x * ChunkWidth, FMath::FRandRange(0, ChunkWidth) + y * ChunkWidth, 20.0f);
+					
+					if (RandomPos.Size() < 500.0f)
+					{
+						i--;
+						continue;
+					}
+
 					GetWorld()->SpawnActor<AActor>(Cactus, RandomPos, FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f));
 				}
 			}
 		}
 	}
+}
+
+float UWorldChunker::GetWorldBoundDistance()
+{
+	return ChunkWidth * ChunkingRange;
 }
 

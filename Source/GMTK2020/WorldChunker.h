@@ -55,6 +55,7 @@ private:
 // ----------Custom Functions----------
 public:
 	void Update(FVector PlayerLocation);
+	float GetWorldBoundDistance();
 protected:
 private:
 		

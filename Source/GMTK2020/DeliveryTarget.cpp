@@ -9,8 +9,6 @@ ADeliveryTarget::ADeliveryTarget()
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
-
-	DeliveryLocation = FVector(600.0f, 0.0f, 0.0f);
 }
 
 // Called when the game starts or when spawned
@@ -18,7 +16,7 @@ void ADeliveryTarget::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	DeliveryLocation = FVector(FVector::DotProduct(GetActorForwardVector(), DeliveryLocation), FVector::DotProduct(GetActorRightVector(), DeliveryLocation), 0.0f);
+	DeliveryLocation = GetActorForwardVector() * 600.0f + GetActorLocation();
 }
 
 // Called every frame
@@ -29,7 +27,7 @@ void ADeliveryTarget::Tick(float DeltaTime)
 }
 
 bool ADeliveryTarget::IsDeliverable(FVector CarPosition, float DeliveryRange)
-{
-	return FVector::Distance(GetActorLocation() + DeliveryLocation, CarPosition) < DeliveryRange && FVector::DotProduct(GetActorForwardVector(), (CarPosition - DeliveryLocation)) > 0.0f;
+{	
+	return FVector::Distance(DeliveryLocation, CarPosition) < DeliveryRange && FVector::DotProduct(GetActorForwardVector(), (CarPosition - DeliveryLocation)) > 0.0f;
 }
 

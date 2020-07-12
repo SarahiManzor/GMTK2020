@@ -66,15 +66,28 @@ private:
 
 	float Health;
 
+	int32 TotalDeliveries;
+
+	float ReverseTime;
+
 	// ----------Custom Functions----------
 public:
 	void SetDeliveryLocation(FVector NewLocation);
 	float GetSpeed();
+	float GetDeliveryRange();
+	void Reverse(float WorldRange);
+	void ThrowDelivery();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetTotalDeliveries() {return TotalDeliveries;}
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealth() {return Health;}
+
 protected:
 private:
 	void AddForwardForce();
 	void AddTurnForce(float AxisValue);
-	void ThrowDelivery();
 	void UpdateGuideMarker();
 
 };

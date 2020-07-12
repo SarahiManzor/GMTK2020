@@ -28,7 +28,6 @@ public:
 protected:
 private:
 	// Config
-	UPROPERTY(EditAnywhere, Meta = (MakeEditWidget = true))
 	FVector DeliveryLocation;
 
 	// Components
