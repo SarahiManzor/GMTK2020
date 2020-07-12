@@ -7,6 +7,7 @@
 #include "DeliveryTarget.generated.h"
 
 class UStaticMeshComponent;
+class AGMTK2020GameModeBase;
 
 UCLASS()
 class GMTK2020_API ADeliveryTarget : public AActor
@@ -19,6 +20,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit);
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -35,6 +39,7 @@ private:
 	UStaticMeshComponent* Mesh;
 
 	// References
+	AGMTK2020GameModeBase* GameMode;
 
 	// State
 

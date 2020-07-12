@@ -11,6 +11,8 @@
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "GMTK2020GameModeBase.h"
+#include "PizzaBox.h"
 
 // Sets default values
 ADeliveryCar::ADeliveryCar()
@@ -56,6 +58,8 @@ void ADeliveryCar::BeginPlay()
 	Super::BeginPlay();
 
 	Mesh->OnComponentHit.AddDynamic(this, &ADeliveryCar::OnHit);
+
+	GameMode = Cast<AGMTK2020GameModeBase>(GetWorld()->GetAuthGameMode());
 }
 
 void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
@@ -72,6 +76,7 @@ void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 		{
 			Health -= Damage;
 			UE_LOG(LogTemp, Warning, TEXT("Remaining Health: %f"), Health);
+			TimeOfHit = Time;
 		}
 	}
 }
@@ -90,7 +95,7 @@ void ADeliveryCar::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction(TEXT("LeftMouse"), IE_Pressed, this, &ADeliveryCar::ThrowDelivery);
+	PlayerInputComponent->BindAction(TEXT("ThrowPizza"), IE_Pressed, this, &ADeliveryCar::ThrowDelivery);
 
 	PlayerInputComponent->BindAxis(TEXT("Right"), this, &ADeliveryCar::AddTurnForce);
 
@@ -114,12 +119,14 @@ float ADeliveryCar::GetDeliveryRange()
 void ADeliveryCar::Reverse(float WorldRange)
 {
 	float Time = UGameplayStatics::GetTimeSeconds(this);
-	if (Time - ReverseTime < 1.0f) return;
+	if (Time - ReverseTime < 2.0f) return;
 
 	Mesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	FRotator Rotation = GetActorRotation();
-	Rotation.Yaw -= 180.0f;
+
+	Rotation.Yaw -= UKismetMathLibrary::FindLookAtRotation(GuideMesh->GetComponentLocation(), FVector::ZeroVector).Yaw;
 	SetActorRotation(Rotation);
+
 
 	FVector ActorLocation = GetActorLocation();
 	ActorLocation.X = FMath::Clamp(ActorLocation.X, -WorldRange, WorldRange);
@@ -143,10 +150,26 @@ void ADeliveryCar::AddTurnForce(float AxisValue)
 
 void ADeliveryCar::ThrowDelivery()
 {
-	UE_LOG (LogTemp, Warning, TEXT("Pizza Delivered!"));
-	TotalDeliveries += 1;
+	UE_LOG(LogTemp, Warning, TEXT("Pizza Thrown"));
 
 	// Todo spawn pizza box mesh and throw at house (Make sure car doesnt collide with the box
+	if (PizzaBox)
+	{
+		APizzaBox* Pizza = GetWorld()->SpawnActor<APizzaBox>(PizzaBox, GetActorLocation() + FVector::UpVector * 160.0f, FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f));
+		FVector ThrowDirection = DeliveryLocation - GetActorLocation();
+		ThrowDirection.Z = 0.0f;
+		ThrowDirection.Normalize();
+
+		UE_LOG(LogTemp, Warning, TEXT("Throw velocity: %s"), *GetVelocity().ToCompactString());
+		bool InRange = FVector::Distance(DeliveryLocation, GetActorLocation()) < DeliveryRange;
+		Pizza->GetMesh()->AddForce(ThrowDirection * DeliveryForce + (InRange ? ThrowDirection * DeliveryForce : (GetVelocity() / 10.0f)));
+	}
+}
+
+void ADeliveryCar::SuccessfulDelivery()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Pizza Delivered!"));
+	TotalDeliveries += 1;
 }
 
 void ADeliveryCar::UpdateGuideMarker()

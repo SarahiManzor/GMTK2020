@@ -50,11 +50,11 @@ private:
 
 // ----------Custom Functions----------
 public:
+	bool CheckDelivery(ADeliveryTarget* Target);
 protected:
 private:
 	void SpawnRandomDeliveryLocations();
 	void SetNewTarget();
-	void CheckDelivery();
 	void CheckCarBounds();
 	
 };

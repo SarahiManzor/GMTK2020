@@ -3,6 +3,7 @@
 
 #include "DeliveryTarget.h"
 #include "Components/StaticMeshComponent.h"
+#include "GMTK2020GameModeBase.h"
 
 // Sets default values
 ADeliveryTarget::ADeliveryTarget()
@@ -16,7 +17,19 @@ void ADeliveryTarget::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	DeliveryLocation = GetActorForwardVector() * 600.0f + GetActorLocation();
+	DeliveryLocation = GetActorForwardVector() * 425.0f + GetActorLocation();
+
+	Mesh->OnComponentHit.AddDynamic(this, &ADeliveryTarget::OnHit);
+
+	GameMode = Cast<AGMTK2020GameModeBase>(GetWorld()->GetAuthGameMode());
+}
+
+void ADeliveryTarget::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor->GetName().Contains("pizza") && IsDeliverable(OtherActor->GetActorLocation(), 1000.0f))
+	{
+		GameMode->CheckDelivery(this);
+	}
 }
 
 // Called every frame

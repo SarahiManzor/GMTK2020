@@ -40,7 +40,6 @@ void AGMTK2020GameModeBase::Tick(float DeltaTime)
 	//UE_LOG(LogTemp, Warning, TEXT("Ticking"));
 	//UE_LOG(LogTemp, Warning, TEXT("Speed: %f"), MainCar->GetSpeed());
 
-	CheckDelivery();
 	CheckCarBounds();
 	
 	//if (WorldChunker)
@@ -54,6 +53,7 @@ void AGMTK2020GameModeBase::SpawnRandomDeliveryLocations()
 	if (!DeliveryLocationClass) return;
 
 	float WorldRange = WorldChunker != nullptr ? WorldChunker->GetWorldBoundDistance() : 100000.0f; 
+	WorldRange *= 0.9f;
 	for (int32 i = 0; i < TotalLocations; i++)
 	{
 		float RandomX = FMath::FRandRange(-WorldRange, WorldRange);
@@ -100,15 +100,18 @@ void AGMTK2020GameModeBase::SetNewTarget()
 	}
 }
 
-void AGMTK2020GameModeBase::CheckDelivery()
+bool AGMTK2020GameModeBase::CheckDelivery(ADeliveryTarget* Target)
 {
-	if (!MainCar || !CurrentTarget) return;
+	if (!MainCar || !CurrentTarget || Target != CurrentTarget) return false;
 
 	if (CurrentTarget->IsDeliverable(MainCar->GetActorLocation(), MainCar->GetDeliveryRange()))
-	{
-		MainCar->ThrowDelivery();
+	{	
+		MainCar->SuccessfulDelivery();
 		SetNewTarget();
+		return true;
 	}
+
+	return false;
 }
 
 void AGMTK2020GameModeBase::CheckCarBounds()

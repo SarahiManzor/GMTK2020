@@ -10,6 +10,8 @@ class UBoxComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UStaticMeshComponent;
+class AGMTK2020GameModeBase;
+class APizzaBox;
 
 UCLASS()
 class GMTK2020_API ADeliveryCar : public APawn
@@ -34,10 +36,16 @@ protected:
 private:
 	// Config
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<APizzaBox> PizzaBox;
+
+	UPROPERTY(EditAnywhere)
 	float AccelerationForce; // Force applied for moving forward
 
 	UPROPERTY(EditAnywhere)
 	float TurnForce; // Force applied for turning
+
+	UPROPERTY(EditAnywhere)
+	float DeliveryForce; // Force applied for turning
 
 	UPROPERTY(EditAnywhere)
 	float DeliveryRange;
@@ -63,6 +71,7 @@ private:
 	UStaticMeshComponent* GuideMesh;
 
 	// References
+	AGMTK2020GameModeBase* GameMode;
 
 	// State
 	FVector DeliveryLocation;
@@ -83,6 +92,7 @@ public:
 	float GetDeliveryRange();
 	void Reverse(float WorldRange);
 	void ThrowDelivery();
+	void SuccessfulDelivery();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 GetTotalDeliveries() {return TotalDeliveries;}
