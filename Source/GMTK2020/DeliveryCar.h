@@ -70,6 +70,9 @@ private:
 
 	float ReverseTime;
 
+	float TimeOfHit;
+	float InvicibilityTime;
+
 	// ----------Custom Functions----------
 public:
 	void SetDeliveryLocation(FVector NewLocation);
@@ -89,5 +92,8 @@ private:
 	void AddForwardForce();
 	void AddTurnForce(float AxisValue);
 	void UpdateGuideMarker();
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 };

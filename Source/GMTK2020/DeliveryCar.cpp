@@ -44,12 +44,32 @@ ADeliveryCar::ADeliveryCar()
 
 	TotalDeliveries = 0;
 	ReverseTime = 0.0f;
+	TimeOfHit = 0.0f;
+	InvicibilityTime = 0.25f;
+	Health = 100000;
 }
 
 // Called when the game starts or when spawned
 void ADeliveryCar::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Mesh->OnComponentHit.AddDynamic(this, &ADeliveryCar::OnHit);
+}
+
+void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor->GetName().Contains("floor")) return;
+	
+	float Time = UGameplayStatics::GetTimeSeconds(this);
+	if (Time - TimeOfHit > InvicibilityTime)
+	{
+		float Damage = NormalImpulse.Size();
+		UE_LOG(LogTemp, Warning, TEXT("Crash Impulse: %f"), Damage);
+
+		Health -= Damage;
+		UE_LOG(LogTemp, Warning, TEXT("Remaining Health: %f"), Health);
+	}
 }
 
 // Called every frame
