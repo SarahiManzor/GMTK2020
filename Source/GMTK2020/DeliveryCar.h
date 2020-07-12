@@ -144,7 +144,7 @@ public:
 
 protected:
 private:
-	void AddForwardForce(float Time);
+	void AddForwardForce();
 	void AddTurnForce(float AxisValue);
 	void UpdateGuideMarker();
 	void UpdateTires();

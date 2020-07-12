@@ -15,6 +15,8 @@
 #include "PizzaBox.h"
 #include "Sound/SoundBase.h"
 #include "Components/AudioComponent.h"
+#include "Engine/Engine.h"
+#include "TimerManager.h" 
 
 // Sets default values
 ADeliveryCar::ADeliveryCar()
@@ -71,6 +73,8 @@ void ADeliveryCar::BeginPlay()
 	CarMesh->OnComponentHit.AddDynamic(this, &ADeliveryCar::OnHit);
 
 	GameMode = Cast<AGMTK2020GameModeBase>(GetWorld()->GetAuthGameMode());
+
+	FTimerHandle Handle;
 }
 
 void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
@@ -80,7 +84,7 @@ void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 	float Time = UGameplayStatics::GetTimeSeconds(this);
 	if (Time - TimeOfHit > InvicibilityTime)
 	{
-		float Damage = NormalImpulse.Size();
+		float Damage = NormalImpulse.Size() / 1000.0f;
 		UE_LOG(LogTemp, Warning, TEXT("Crash Impulse: %f"), Damage);
 
 		if (Damage > 100.0f)
@@ -108,11 +112,9 @@ void ADeliveryCar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	AddForwardForce();
+
 	FrameTime = DeltaTime;
-	if (bIsPlaying)
-	{
-		AddForwardForce(DeltaTime);
-	}
 	UpdateGuideMarker();
 	UpdateTires();
 
@@ -175,18 +177,24 @@ void ADeliveryCar::Reverse(float WorldRange)
 	ReverseTime = Time;
 }
 
-void ADeliveryCar::AddForwardForce(float Time)
+void ADeliveryCar::AddForwardForce()
 {
+	if (!bIsPlaying) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Force"));
 	//AddMovementInput(GetActorForwardVector(), AccelerationForce);
 	if (GetSpeed() < TopSpeed)
-		CarMesh->AddForce(AccelerationForce * GetActorForwardVector() * Time *  120.0f);
+	{
+		FVector Force = AccelerationForce * GetActorForwardVector() * FrameTime;
+		CarMesh->AddImpulse(Force);
+	}
 	//UE_LOG(LogTemp, Warning, TEXT("Adding Force"));
 }
 
 void ADeliveryCar::AddTurnForce(float AxisValue)
 {
 	if (bIsPlaying)
-		CarMesh->SetWorldRotation(CarMesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce * FrameTime*  120.0f, 0.0f));
+		CarMesh->SetWorldRotation(CarMesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce * (FrameTime *  120.0f), 0.0f));
 	
 	float zRotation = 0.0f;
 	if (AxisValue < -0.1)
@@ -225,7 +233,7 @@ void ADeliveryCar::ThrowDelivery()
 
 		UE_LOG(LogTemp, Warning, TEXT("Throw velocity: %s"), *GetVelocity().ToCompactString());
 		bool InRange = FVector::Distance(DeliveryLocation, GetActorLocation()) < DeliveryRange;
-		Pizza->GetMesh()->AddForce(ThrowDirection * DeliveryForce + (InRange ? ThrowDirection * DeliveryForce : (GetVelocity() / 10.0f)));
+		Pizza->GetMesh()->AddImpulse((ThrowDirection * DeliveryForce * FrameTime + (InRange ? ThrowDirection * DeliveryForce * FrameTime : (GetVelocity() / 1000.0f))));
 		
 		if (PizzaSound)
 		{

@@ -121,14 +121,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "RuntimePhysXCooking",
-			"Enabled": false
-		},
-		{
-			"Name": "PhysXVehicles",
-			"Enabled": false
-		},
-		{
 			"Name": "PerforceSourceControl",
 			"Enabled": false
 		},
