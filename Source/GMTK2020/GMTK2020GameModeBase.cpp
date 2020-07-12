@@ -58,14 +58,25 @@ void AGMTK2020GameModeBase::SpawnRandomDeliveryLocations()
 	{
 		float RandomX = FMath::FRandRange(-WorldRange, WorldRange);
 		float RandomY = FMath::FRandRange(-WorldRange, WorldRange);
+		FVector SpawnLocation = FVector(RandomX, RandomY, 20.0f);
+		
+		bool TooClose = false;
+		for (int32 j = 0; j < i; j++)
+		{
+			if (FVector::Distance(SpawnLocation, DeliveryLocations[j]->GetActorLocation()) < 1000.0f)
+			{
+				TooClose = true;
+				break;
+			}
+		}
 
-		if (FVector2D(RandomX, RandomY).Size() < 1000.0f)
+		if (SpawnLocation.Size() < 1000.0f || TooClose)
 		{
 			i--;
 			continue;
 		}
 
-		ADeliveryTarget* Target = GetWorld()->SpawnActor<ADeliveryTarget>(DeliveryLocationClass, FVector(RandomX, RandomY, 20.0f), FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f));
+		ADeliveryTarget* Target = GetWorld()->SpawnActor<ADeliveryTarget>(DeliveryLocationClass, SpawnLocation, FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f));
 		DeliveryLocations.Add(Target);
 	}
 }

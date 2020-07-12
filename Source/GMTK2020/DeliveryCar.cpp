@@ -46,7 +46,8 @@ ADeliveryCar::ADeliveryCar()
 	ReverseTime = 0.0f;
 	TimeOfHit = 0.0f;
 	InvicibilityTime = 0.25f;
-	Health = 100000;
+	TotalHealth = 100000;
+	Health = TotalHealth;
 }
 
 // Called when the game starts or when spawned
@@ -67,8 +68,11 @@ void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 		float Damage = NormalImpulse.Size();
 		UE_LOG(LogTemp, Warning, TEXT("Crash Impulse: %f"), Damage);
 
-		Health -= Damage;
-		UE_LOG(LogTemp, Warning, TEXT("Remaining Health: %f"), Health);
+		if (Damage > 100.0f)
+		{
+			Health -= Damage;
+			UE_LOG(LogTemp, Warning, TEXT("Remaining Health: %f"), Health);
+		}
 	}
 }
 

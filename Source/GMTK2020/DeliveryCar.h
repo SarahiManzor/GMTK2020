@@ -45,6 +45,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float TopSpeed;
 
+	UPROPERTY(EditAnywhere)
+	float TotalHealth;
+
 	// Components
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
@@ -81,11 +84,14 @@ public:
 	void Reverse(float WorldRange);
 	void ThrowDelivery();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 GetTotalDeliveries() {return TotalDeliveries;}
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetHealth() {return Health;}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetTotalHealth() { return TotalHealth; }
 
 protected:
 private:
