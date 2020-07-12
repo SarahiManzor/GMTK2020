@@ -56,6 +56,10 @@ ADeliveryCar::ADeliveryCar()
 	InvicibilityTime = 0.25f;
 	TotalHealth = 100000;
 	Health = TotalHealth;
+	Health = 1.0f;
+	PizzasThrown = 0;
+
+	bIsPlaying = false;
 }
 
 // Called when the game starts or when spawned
@@ -83,6 +87,12 @@ void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 			Health -= Damage;
 			UE_LOG(LogTemp, Warning, TEXT("Remaining Health: %f"), Health);
 			TimeOfHit = Time;
+
+			if (Health < 0.0f)
+			{
+				EndGame_Implementation();
+				EndGame();
+			}
 		}
 	}
 }
@@ -92,8 +102,15 @@ void ADeliveryCar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AddForwardForce();
+	if (bIsPlaying)
+	{
+		AddForwardForce();
+	}
 	UpdateGuideMarker();
+	UpdateTires();
+
+	if (GuideMesh->GetVisibleFlag() != bIsPlaying)
+		GuideMesh->SetVisibility(bIsPlaying);
 }
 
 // Called to bind functionality to input
@@ -105,6 +122,11 @@ void ADeliveryCar::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAxis(TEXT("Right"), this, &ADeliveryCar::AddTurnForce);
 
+}
+
+void ADeliveryCar::StartEngine()
+{
+	bIsPlaying = true;
 }
 
 void ADeliveryCar::SetDeliveryLocation(FVector NewLocation)
@@ -147,12 +169,12 @@ void ADeliveryCar::AddForwardForce()
 	if (GetSpeed() < TopSpeed)
 		CarMesh->AddForce(AccelerationForce * GetActorForwardVector());
 	//UE_LOG(LogTemp, Warning, TEXT("Adding Force"));
-	UpdateTires();
 }
 
 void ADeliveryCar::AddTurnForce(float AxisValue)
 {
-	CarMesh->SetWorldRotation(CarMesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce, 0.0f));
+	if (bIsPlaying)
+		CarMesh->SetWorldRotation(CarMesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce, 0.0f));
 	
 	float zRotation = 0.0f;
 	if (AxisValue < -0.1)
@@ -183,6 +205,7 @@ void ADeliveryCar::ThrowDelivery()
 	// Todo spawn pizza box mesh and throw at house (Make sure car doesnt collide with the box
 	if (PizzaBox)
 	{
+		PizzasThrown += 1;
 		APizzaBox* Pizza = GetWorld()->SpawnActor<APizzaBox>(PizzaBox, GetActorLocation() + FVector::UpVector * 160.0f, FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f));
 		FVector ThrowDirection = DeliveryLocation - GetActorLocation();
 		ThrowDirection.Z = 0.0f;
@@ -203,6 +226,23 @@ void ADeliveryCar::SuccessfulDelivery()
 int32 ADeliveryCar::GetTotalDeliveries()
 {
 	return TotalDeliveries;
+}
+
+int32 ADeliveryCar::GetPizzasThrown()
+{
+	return PizzasThrown;
+}
+
+void ADeliveryCar::EndGame_Implementation()
+{
+	bIsPlaying = false;
+	UE_LOG(LogTemp, Warning, TEXT("Dead"));
+
+	if (GameMode)
+	{
+		GameMode->EndGame_Implementation();
+		GameMode->EndGame();
+	}
 }
 
 void ADeliveryCar::UpdateGuideMarker()

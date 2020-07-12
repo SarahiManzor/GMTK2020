@@ -114,6 +114,17 @@ bool AGMTK2020GameModeBase::CheckDelivery(ADeliveryTarget* Target)
 	return false;
 }
 
+void AGMTK2020GameModeBase::StartGame()
+{
+	if (MainCar)
+		MainCar->StartEngine();
+}
+
+void AGMTK2020GameModeBase::EndGame_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("End Game"));
+}
+
 void AGMTK2020GameModeBase::CheckCarBounds()
 {
 	float WorldRange = WorldChunker != nullptr ? WorldChunker->GetWorldBoundDistance() : 100000.0f;

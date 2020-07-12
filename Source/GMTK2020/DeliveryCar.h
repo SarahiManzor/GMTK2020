@@ -86,14 +86,19 @@ private:
 	float Health;
 
 	int32 TotalDeliveries;
+	int32 PizzasThrown;
 
 	float ReverseTime;
 
 	float TimeOfHit;
 	float InvicibilityTime;
 
+	bool bIsPlaying;
+
 	// ----------Custom Functions----------
 public:
+	void StartEngine();
+
 	void SetDeliveryLocation(FVector NewLocation);
 	float GetSpeed();
 	float GetDeliveryRange();
@@ -105,10 +110,19 @@ public:
 	int32 GetTotalDeliveries();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int32 GetPizzasThrown();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetHealth() {return Health;}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTotalHealth() { return TotalHealth; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetPlaying() { return bIsPlaying; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void EndGame();
 
 protected:
 private:

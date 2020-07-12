@@ -51,6 +51,13 @@ private:
 // ----------Custom Functions----------
 public:
 	bool CheckDelivery(ADeliveryTarget* Target);
+
+	UFUNCTION(BlueprintCallable)
+	void StartGame();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void EndGame();
+
 protected:
 private:
 	void SpawnRandomDeliveryLocations();
