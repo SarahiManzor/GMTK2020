@@ -44,3 +44,8 @@ bool ADeliveryTarget::IsDeliverable(FVector CarPosition, float DeliveryRange)
 	return FVector::Distance(DeliveryLocation, CarPosition) < DeliveryRange && FVector::DotProduct(GetActorForwardVector(), (CarPosition - DeliveryLocation)) > 0.0f;
 }
 
+FVector ADeliveryTarget::GetDeliveryTargetLocation()
+{
+	return DeliveryLocation;
+}
+

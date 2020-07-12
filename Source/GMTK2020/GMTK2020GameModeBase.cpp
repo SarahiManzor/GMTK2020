@@ -94,7 +94,7 @@ void AGMTK2020GameModeBase::SetNewTarget()
 		|| CurrentTarget != nullptr && NewTarget != CurrentTarget && CurrentTarget->GetDistanceTo(NewTarget) < MaximumNextRange)
 		{
 			CurrentTarget = NewTarget;
-			MainCar->SetDeliveryLocation(NewTarget->GetActorLocation());
+			MainCar->SetDeliveryLocation(NewTarget->GetDeliveryTargetLocation());
 			break;
 		}
 	}

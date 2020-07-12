@@ -130,7 +130,7 @@ void ADeliveryCar::Reverse(float WorldRange)
 	CarMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	FRotator Rotation = GetActorRotation();
 
-	Rotation.Yaw -= UKismetMathLibrary::FindLookAtRotation(GuideMesh->GetComponentLocation(), FVector::ZeroVector).Yaw;
+	Rotation.Yaw = UKismetMathLibrary::FindLookAtRotation(GuideMesh->GetComponentLocation(), FVector::ZeroVector).Yaw;
 	SetActorRotation(Rotation);
 
 

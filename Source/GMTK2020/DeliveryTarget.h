@@ -46,6 +46,7 @@ private:
 // ----------Custom Functions----------
 public:
 	bool IsDeliverable(FVector CarPosition, float DeliveryRange);
+	FVector GetDeliveryTargetLocation();
 protected:
 private:
 };
