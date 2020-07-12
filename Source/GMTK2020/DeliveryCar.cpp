@@ -20,12 +20,12 @@ ADeliveryCar::ADeliveryCar()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Mesh
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	SetRootComponent(Mesh);
+	CarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainMesh"));
+	SetRootComponent(CarMesh);
 
 	// Camera Boom
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	SpringArm->SetupAttachment(Mesh);
+	SpringArm->SetupAttachment(CarMesh);
 
 	// Camera
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -33,7 +33,13 @@ ADeliveryCar::ADeliveryCar()
 
 	// Guide Mesh
 	GuideMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Guide Mesh"));
-	GuideMesh->SetupAttachment(Mesh);
+	GuideMesh->SetupAttachment(CarMesh);
+
+	LeftTrye = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Tyre"));
+	LeftTrye->SetupAttachment(CarMesh);
+
+	RightTyre = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Tyre"));
+	RightTyre->SetupAttachment(CarMesh);
 
 	// Base speeds
 	AccelerationForce = 100.0f;
@@ -57,7 +63,7 @@ void ADeliveryCar::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Mesh->OnComponentHit.AddDynamic(this, &ADeliveryCar::OnHit);
+	CarMesh->OnComponentHit.AddDynamic(this, &ADeliveryCar::OnHit);
 
 	GameMode = Cast<AGMTK2020GameModeBase>(GetWorld()->GetAuthGameMode());
 }
@@ -121,7 +127,7 @@ void ADeliveryCar::Reverse(float WorldRange)
 	float Time = UGameplayStatics::GetTimeSeconds(this);
 	if (Time - ReverseTime < 2.0f) return;
 
-	Mesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	CarMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	FRotator Rotation = GetActorRotation();
 
 	Rotation.Yaw -= UKismetMathLibrary::FindLookAtRotation(GuideMesh->GetComponentLocation(), FVector::ZeroVector).Yaw;
@@ -139,13 +145,35 @@ void ADeliveryCar::AddForwardForce()
 {
 	//AddMovementInput(GetActorForwardVector(), AccelerationForce);
 	if (GetSpeed() < TopSpeed)
-	Mesh->AddForce(AccelerationForce * GetActorForwardVector());
+		CarMesh->AddForce(AccelerationForce * GetActorForwardVector());
 	//UE_LOG(LogTemp, Warning, TEXT("Adding Force"));
+	UpdateTires();
 }
 
 void ADeliveryCar::AddTurnForce(float AxisValue)
 {
-	Mesh->SetWorldRotation(Mesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce, 0.0f));
+	CarMesh->SetWorldRotation(CarMesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce, 0.0f));
+	
+	float zRotation = 0.0f;
+	if (AxisValue < -0.1)
+	{
+		zRotation = -40.0f;
+	}
+	else if (AxisValue > 0.1)
+	{
+		zRotation = 40.0f;
+	}
+
+	FRotator Rotation = FRotator(0.0f, zRotation, 0.0f);
+	TargetRotation = Rotation;
+}
+
+void ADeliveryCar::UpdateTires()
+{
+	FRotator CurrentRotation = LeftTrye->GetRelativeRotation();
+	FRotator NewRotation = UKismetMathLibrary::RLerp(CurrentRotation, TargetRotation, 0.1f, true);
+	LeftTrye->SetRelativeRotation(NewRotation);
+	RightTyre->SetRelativeRotation(NewRotation);
 }
 
 void ADeliveryCar::ThrowDelivery()
@@ -170,6 +198,11 @@ void ADeliveryCar::SuccessfulDelivery()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Pizza Delivered!"));
 	TotalDeliveries += 1;
+}
+
+int32 ADeliveryCar::GetTotalDeliveries()
+{
+	return TotalDeliveries;
 }
 
 void ADeliveryCar::UpdateGuideMarker()

@@ -64,17 +64,24 @@ private:
 	USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* Mesh;
+	UStaticMeshComponent* CarMesh;
 
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* GuideMesh;
+	
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* LeftTrye;
 
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* RightTyre;
+	
 	// References
 	AGMTK2020GameModeBase* GameMode;
 
 	// State
 	FVector DeliveryLocation;
+	FRotator TargetRotation;
 
 	float Health;
 
@@ -95,7 +102,7 @@ public:
 	void SuccessfulDelivery();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int32 GetTotalDeliveries() {return TotalDeliveries;}
+	int32 GetTotalDeliveries();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetHealth() {return Health;}
@@ -108,6 +115,7 @@ private:
 	void AddForwardForce();
 	void AddTurnForce(float AxisValue);
 	void UpdateGuideMarker();
+	void UpdateTires();
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
