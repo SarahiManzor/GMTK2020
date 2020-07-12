@@ -12,6 +12,8 @@ class USpringArmComponent;
 class UStaticMeshComponent;
 class AGMTK2020GameModeBase;
 class APizzaBox;
+class USoundBase;
+class UAudioComponent;
 
 UCLASS()
 class GMTK2020_API ADeliveryCar : public APawn
@@ -74,7 +76,18 @@ private:
 	UStaticMeshComponent* LeftTrye;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* RightTyre;
+		UStaticMeshComponent* RightTyre;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* DeliverySound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* CrashSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* RocketSound;
+
+	UAudioComponent* PlayingRocketSound;
 	
 	// References
 	AGMTK2020GameModeBase* GameMode;
@@ -119,7 +132,7 @@ public:
 	float GetTotalHealth() { return TotalHealth; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetPlaying() { return bIsPlaying; }
+	bool GetPlaying() { return bIsPlaying; }
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void EndGame();

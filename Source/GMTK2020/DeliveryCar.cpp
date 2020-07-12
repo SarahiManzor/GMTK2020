@@ -13,6 +13,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GMTK2020GameModeBase.h"
 #include "PizzaBox.h"
+#include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ADeliveryCar::ADeliveryCar()
@@ -56,7 +58,6 @@ ADeliveryCar::ADeliveryCar()
 	InvicibilityTime = 0.25f;
 	TotalHealth = 100000;
 	Health = TotalHealth;
-	Health = 1.0f;
 	PizzasThrown = 0;
 
 	bIsPlaying = false;
@@ -93,6 +94,11 @@ void ADeliveryCar::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 				EndGame_Implementation();
 				EndGame();
 			}
+
+			if (CrashSound)
+			{
+				UGameplayStatics::PlaySound2D(GetWorld(), CrashSound);
+			}
 		}
 	}
 }
@@ -127,6 +133,11 @@ void ADeliveryCar::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void ADeliveryCar::StartEngine()
 {
 	bIsPlaying = true;
+
+	if (RocketSound)
+	{
+		PlayingRocketSound = UGameplayStatics::SpawnSound2D(GetWorld(), RocketSound);
+	}
 }
 
 void ADeliveryCar::SetDeliveryLocation(FVector NewLocation)
@@ -221,6 +232,11 @@ void ADeliveryCar::SuccessfulDelivery()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Pizza Delivered!"));
 	TotalDeliveries += 1;
+
+	if (DeliverySound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), DeliverySound);
+	}
 }
 
 int32 ADeliveryCar::GetTotalDeliveries()
@@ -242,6 +258,11 @@ void ADeliveryCar::EndGame_Implementation()
 	{
 		GameMode->EndGame_Implementation();
 		GameMode->EndGame();
+	}
+
+	if (PlayingRocketSound)
+	{
+		PlayingRocketSound->SetPaused(true);
 	}
 }
 

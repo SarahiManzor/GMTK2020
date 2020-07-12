@@ -58,7 +58,7 @@ void AGMTK2020GameModeBase::SpawnRandomDeliveryLocations()
 	{
 		float RandomX = FMath::FRandRange(-WorldRange, WorldRange);
 		float RandomY = FMath::FRandRange(-WorldRange, WorldRange);
-		FVector SpawnLocation = FVector(RandomX, RandomY, 20.0f);
+		FVector SpawnLocation = FVector(RandomX, RandomY, 18.0f);
 		
 		bool TooClose = false;
 		for (int32 j = 0; j < i; j++)
