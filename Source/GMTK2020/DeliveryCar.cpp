@@ -108,9 +108,10 @@ void ADeliveryCar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FrameTime = DeltaTime;
 	if (bIsPlaying)
 	{
-		AddForwardForce();
+		AddForwardForce(DeltaTime);
 	}
 	UpdateGuideMarker();
 	UpdateTires();
@@ -174,18 +175,18 @@ void ADeliveryCar::Reverse(float WorldRange)
 	ReverseTime = Time;
 }
 
-void ADeliveryCar::AddForwardForce()
+void ADeliveryCar::AddForwardForce(float Time)
 {
 	//AddMovementInput(GetActorForwardVector(), AccelerationForce);
 	if (GetSpeed() < TopSpeed)
-		CarMesh->AddForce(AccelerationForce * GetActorForwardVector());
+		CarMesh->AddForce(AccelerationForce * GetActorForwardVector() * Time *  120.0f);
 	//UE_LOG(LogTemp, Warning, TEXT("Adding Force"));
 }
 
 void ADeliveryCar::AddTurnForce(float AxisValue)
 {
 	if (bIsPlaying)
-		CarMesh->SetWorldRotation(CarMesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce, 0.0f));
+		CarMesh->SetWorldRotation(CarMesh->GetComponentRotation() + FRotator(0.0f, AxisValue * TurnForce * FrameTime*  120.0f, 0.0f));
 	
 	float zRotation = 0.0f;
 	if (AxisValue < -0.1)

@@ -111,6 +111,8 @@ private:
 
 	bool bIsPlaying;
 
+	float FrameTime;
+
 	// ----------Custom Functions----------
 public:
 	void StartEngine();
@@ -142,7 +144,7 @@ public:
 
 protected:
 private:
-	void AddForwardForce();
+	void AddForwardForce(float Time);
 	void AddTurnForce(float AxisValue);
 	void UpdateGuideMarker();
 	void UpdateTires();
