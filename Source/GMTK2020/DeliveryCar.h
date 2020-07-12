@@ -87,6 +87,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	USoundBase* RocketSound;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* PizzaSound;
+
 	UAudioComponent* PlayingRocketSound;
 	
 	// References

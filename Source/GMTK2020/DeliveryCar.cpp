@@ -225,6 +225,11 @@ void ADeliveryCar::ThrowDelivery()
 		UE_LOG(LogTemp, Warning, TEXT("Throw velocity: %s"), *GetVelocity().ToCompactString());
 		bool InRange = FVector::Distance(DeliveryLocation, GetActorLocation()) < DeliveryRange;
 		Pizza->GetMesh()->AddForce(ThrowDirection * DeliveryForce + (InRange ? ThrowDirection * DeliveryForce : (GetVelocity() / 10.0f)));
+		
+		if (PizzaSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), PizzaSound);
+		}
 	}
 }
 
